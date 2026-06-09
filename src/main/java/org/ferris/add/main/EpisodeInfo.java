@@ -3,17 +3,14 @@ package org.ferris.add.main;
 import java.time.LocalDate;
 
 public record EpisodeInfo(
-        String showName,
-        int showId,
-        String episodeName,
-        int season,
-        int episodeNumber,
-        String channelName,
-        LocalDate airDate
+          int id
+        , String name
+        , int season
+        , int episode
+        , LocalDate airDate
 ) {
-
-    public enum ChannelType {
-        NETWORK,
-        WEB
+    @Override
+    public String toString() {
+        return "s%02de%03d - %s [%d]".formatted(season, episode, name, id);
     }
 }
