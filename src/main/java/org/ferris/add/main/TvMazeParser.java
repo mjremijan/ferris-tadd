@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.InputStream;
 import java.time.LocalDate;
 import java.util.stream.Stream;
+import org.ferris.add.main.EpisodeInfo.ChannelType;
 
 public class TvMazeParser {
 
@@ -29,28 +30,41 @@ public class TvMazeParser {
 
         while (parser.nextToken() == JsonToken.START_OBJECT) {
 
+            // ROOT episode
             JsonNode episode = mapper.readTree(parser);
-
-            String airDateText = episode.path("airdate").asText(null);
-
-            if (airDateText == null || airDateText.isBlank()) {
+            if (episode == null) {
                 continue;
             }
-
-            LocalDate airDate = LocalDate.parse(airDateText);
-
-            if (airDate.isBefore(today) || airDate.isAfter(cutoff)) {
-                continue;
-            }
-
+            // ROOT show
             JsonNode show = episode.path("_embedded").path("show");
-
+            if (show == null) {
+                continue;
+            }
+            
+            // show id
+            int showId = show.path("id").asInt();
+            
+            // show name
+            String showName = show.path("name").asText();
+            
+            // language
+            String language = show.path("language").asText(null);
+            if (language == null) {
+                throw new RuntimeException("Show id %d has no language".formatted(showId));
+            } 
+            else 
+            if (!"English".equalsIgnoreCase(language)) {
+                continue;
+            }
+            
+            // channel name
+            // channel type
             String channelName = null;
-
+            ChannelType channelType = null;
             JsonNode network = show.path("network");
             if (!network.isNull()) {
                 channelName = network.path("name").asText(null);
-                
+                channelType = ChannelType.NETWORK; 
                 JsonNode country = network.path("country");
                 if (!country.isNull()) {
                     String countryCode = country.path("code").asText("");
@@ -59,23 +73,53 @@ public class TvMazeParser {
                     }
                 }
             }
-
             if (channelName == null || channelName.isBlank()) {
                 JsonNode webChannel = show.path("webChannel");
                 if (!webChannel.isNull()) {
                     channelName = webChannel.path("name").asText(null);
+                    channelType = ChannelType.WEB;
                 }
             }
+            if (isUnknown(channelName)) {
+                continue;
+            }
+            
+            // episode name
+            // season
+            // episode number
+            String episodeName = episode.path("name").asText(null);
+            if (isUnknown(episodeName)) {
+                continue;
+            }
+            int season = episode.path("season").asInt();
+            int episodeNumber = episode.path("number").asInt();
 
+            // air date
+            String airDateText = episode.path("airdate").asText(null);
+            if (airDateText == null || airDateText.isBlank()) {
+                continue;
+            }
+            LocalDate airDate = LocalDate.parse(airDateText);
+            if (airDate.isBefore(today) || airDate.isAfter(cutoff)) {
+                continue;
+            }
+
+            
+            
             builder.add(new EpisodeInfo(
-                    show.path("name").asText(),
-                    episode.path("name").asText(),
-                    episode.path("season").asInt(),
-                    episode.path("number").asInt(),
+                    showName,
+                    showId,
+                    episodeName,
+                    season,
+                    episodeNumber,
                     channelName,
                     airDate));
         }
 
         return builder.build();
+    }
+    
+    private boolean isUnknown(String s) {
+        return (s != null && (s.startsWith("?") && s.endsWith("?")));
     }
 }

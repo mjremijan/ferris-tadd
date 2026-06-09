@@ -18,14 +18,16 @@ public class Main {
                     .forEach(ep ->
                             //1485
                             System.out.printf(
-                                    "%d %s S%02dE%02d %-30s %-15s %s%n",
+                                    "%04d %s %-23s %d %s - s%02de%03d - %s%n",
                                     i.getAndIncrement(),
+                                    ep.airDate(),
+                                    ep.channelName(),
+                                    ep.showId(),
                                     ep.showName(),
                                     ep.season(),
                                     ep.episodeNumber(),
-                                    ep.episodeName(),
-                                    ep.channelName(),
-                                    ep.airDate()));
+                                    ep.episodeName()
+                            ));
         }
     }
 }
