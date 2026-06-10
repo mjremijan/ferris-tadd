@@ -26,7 +26,7 @@ public class Main {
             = DateTimeFormatter.ofPattern("EEEE, MMMM d");
         
         DateTimeFormatter formatter2
-            = DateTimeFormatter.ofPattern("EEEE, MMMM d yyyy");
+            = DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy");
         
         parser.streamUpcomingEpisodes(json)
             .collect(Collectors.groupingBy(
@@ -78,7 +78,7 @@ public class Main {
         ObjectNode req = mapper.createObjectNode();
         req.put("from", "onboarding@resend.dev");
         req.putArray("to").add("mjremijan@yahoo.com");
-        req.put("subject", "Ferris AirDate for " + formatter2.format(LocalDate.now()));
+        req.put("subject", "AirDate Digest for " + formatter2.format(LocalDate.now()));
         req.put("html", sw.toString());
         String body = mapper.writeValueAsString(req);
 
