@@ -1,6 +1,5 @@
 package org.ferris.add.main;
 
-import java.io.InputStream;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -13,15 +12,15 @@ public class TvMazeClient {
     private static final String URL =
             "https://api.tvmaze.com/schedule/full";
 
-    public InputStream downloadSchedule() throws Exception {
+    public String downloadSchedule() throws Exception {
         
-        InputStream contents = null;
+        String contents = null;
         
         // read from file?
         if (contents == null) {
             Path path = Path.of("D:\\Desktop\\full.json");
             if (Files.exists(path)) {
-                contents = Files.newInputStream(path);
+                contents = Files.readString(path);
             }
         }   
 
@@ -34,8 +33,8 @@ public class TvMazeClient {
                     .GET()
                     .build();
 
-            HttpResponse<InputStream> response =
-                    client.send(request, HttpResponse.BodyHandlers.ofInputStream());
+            HttpResponse<String> response =
+                    client.send(request, HttpResponse.BodyHandlers.ofString());
             
             contents = response.body();
         }

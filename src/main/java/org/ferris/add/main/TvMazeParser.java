@@ -6,7 +6,6 @@ import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.NullNode;
-import java.io.InputStream;
 import java.time.LocalDate;
 import java.util.stream.Stream;
 import org.ferris.add.main.ChannelInfo.Type;
@@ -15,10 +14,10 @@ public class TvMazeParser {
 
     private final ObjectMapper mapper = new ObjectMapper();
 
-    public Stream<Airing> streamUpcomingEpisodes(InputStream jsonStream) throws Exception {
+    public Stream<Airing> streamUpcomingEpisodes(String json) throws Exception {
 
         JsonFactory factory = mapper.getFactory();
-        JsonParser parser = factory.createParser(jsonStream);
+        JsonParser parser = factory.createParser(json);
 
         if (parser.nextToken() != JsonToken.START_ARRAY) {
             throw new IllegalStateException("Expected JSON array");
@@ -126,10 +125,15 @@ public class TvMazeParser {
     }
 
     private ShowInfo parseShowInfo(JsonNode show) {
+        String type = asString(show, "type");
+        if ("Talk Show".equalsIgnoreCase(type) || "News".equalsIgnoreCase(type)) {
+            return null;
+        }
         return new ShowInfo(
               asIntRequired(show, "id")
             , asStringRequired(show, "name")
             , asString(show, "language")
+            , asString(show, "summary")
         );
     }
 
