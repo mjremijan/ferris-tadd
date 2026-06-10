@@ -8,6 +8,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.TreeMap;
@@ -19,41 +20,13 @@ public class Main {
 
         TvMazeClient client = new TvMazeClient();
         TvMazeParser parser = new TvMazeParser();
-
         String json = client.downloadSchedule();
-
-//        try (InputStream in = client.downloadSchedule()) {
-//            AtomicInteger i = new AtomicInteger(1);
-//            parser.streamUpcomingEpisodes(in)
-//                .map(a -> a.channel().name())
-//                .distinct()
-//                .forEach(n ->
-//                    System.out.printf(
-//                        ", \"%s\" %n",
-//                        n
-//                    )
-//                );
-//        }
-        
-        System.out.printf("%n%n");
-        
-//        try (InputStream in = client.downloadSchedule()) {
-//            AtomicInteger i = new AtomicInteger(1);
-//            parser.streamUpcomingEpisodes(in)
-//                .sorted(Comparator.comparing(a -> a.episode().airDate()))
-//                .forEach(a ->
-//                    System.out.printf(
-//                        "%04d %s %n",
-//                        i.getAndIncrement(),
-//                        a
-//                    )
-//                );
-//        }
-
-        System.out.printf("%n%n");
         
         DateTimeFormatter formatter
             = DateTimeFormatter.ofPattern("EEEE, MMMM d");
+        
+        DateTimeFormatter formatter2
+            = DateTimeFormatter.ofPattern("EEEE, MMMM d yyyy");
         
         parser.streamUpcomingEpisodes(json)
             .collect(Collectors.groupingBy(
@@ -75,9 +48,6 @@ public class Main {
                 ;
             });  
                 
-        
-        
-        
         StringWriter sw = new StringWriter();
         PrintWriter out = new PrintWriter(sw);
                 
@@ -108,7 +78,7 @@ public class Main {
         ObjectNode req = mapper.createObjectNode();
         req.put("from", "onboarding@resend.dev");
         req.putArray("to").add("mjremijan@yahoo.com");
-        req.put("subject", "TV Digest for today");
+        req.put("subject", "Ferris AirDate for " + formatter2.format(LocalDate.now()));
         req.put("html", sw.toString());
         String body = mapper.writeValueAsString(req);
 
