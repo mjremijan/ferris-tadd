@@ -27,7 +27,7 @@ tar xvzf $BASE.tar.gz
 cd $BASE                                                                                                                                           
 cd conf                                                                                                                                            
                                                                                                                                                    
-echo "Linking to email"                                                                                                                            
+echo "Linking to properties"                                                                                                                            
 rm -f tadd.properties                                                                                                                              
 ln -s ../../tadd.properties                                                                                                                        
                                                                                                                                                    
