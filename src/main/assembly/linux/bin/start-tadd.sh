@@ -26,5 +26,5 @@ echo $'\n'
                                                                                                                                  
 echo "START TADD"                                                                                                             
 echo "----------"                                                                                                             
-${JAVA_BIN} -jar ${PD}/lib/ferris-tadd-${project.version}.jar  
+${JAVA_BIN} -Dferris.project.home='${PD}' -jar ${PD}/lib/ferris-tadd-${project.version}.jar  
 

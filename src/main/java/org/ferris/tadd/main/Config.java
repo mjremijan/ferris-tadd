@@ -36,16 +36,13 @@ public class Config {
             }
         }
         
-        // production server
+        // production server "ferris.project.home"
         if (props.isEmpty()) {
             try {           
                 Path confPath = Path.of(
-                    System.getProperty("user.home"),
-                    "applications",
-                    "ferris-tadd"
-                    ,"active"
-                    ,"conf"
-                    ,"tadd.properties"
+                      System.getProperty("ferris.project.home")
+                    , "conf"
+                    , "tadd.properties"
                 );
 
                 InputStream is 
