@@ -5,6 +5,7 @@ public record ShowInfo(
         , String name
         , String language
         , String summary
+        , String imageUrl
 ) {
     @Override
     public String toString() {

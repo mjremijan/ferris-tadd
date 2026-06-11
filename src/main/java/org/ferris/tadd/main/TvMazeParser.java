@@ -125,17 +125,27 @@ public class TvMazeParser {
     }
 
     private ShowInfo parseShowInfo(JsonNode show) {
+        // type
         String type = asString(show, "type");
         if ("Talk Show".equalsIgnoreCase(type) || "News".equalsIgnoreCase(type)) {
             return null;
+        }
+        
+        // image
+        String imageUrl = "";
+        JsonNode imgNode = show.path("image");        
+        if (!imgNode.isMissingNode() && !imgNode.isNull()) {
+            imageUrl = asString(imgNode, "medium");
         }
         return new ShowInfo(
               asIntRequired(show, "id")
             , asStringRequired(show, "name")
             , asString(show, "language")
             , asString(show, "summary")
+            , imageUrl
         );
     }
+    
 
     private ChannelInfo parseChannelInfo(JsonNode show) {
         Type type;

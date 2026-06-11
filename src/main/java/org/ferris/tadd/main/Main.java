@@ -61,7 +61,20 @@ public class Main {
         System.out.printf("Creating HTML email message%n");
         StringWriter sw = new StringWriter();
         PrintWriter out = new PrintWriter(sw);
-                
+        
+        String tr = """
+        <tr>
+            <td style="padding: 10px;">[%s]</td>
+            <td>       
+                <img src="%s" style="max-height:125px; width:auto;">    
+            </td>            
+            <td style="padding: 10px;">
+                <b>%s</b><br />
+                %s
+            </td>
+        </tr>
+        """;
+        
         parser.streamUpcomingEpisodes(json)
             .collect(Collectors.groupingBy(
                 a -> a.episode().airDate(),
@@ -71,15 +84,16 @@ public class Main {
 
                 out.printf("<p><b>%s</b></p>", date.format(formatter));
 
-                record R(String channel, String show, String summary){}
+                record R(String channel, String show, String summary, String imageUrl){}
                 out.printf("<table border=\"1\">%n");
                 episodesForDate.stream()
-                    .map(a -> new R(a.channel().name(), a.show().name(), a.show().summary()))
+                    .map(a -> new R(a.channel().name(), a.show().name(), a.show().summary(), a.show().imageUrl()))
                     .sorted(Comparator.comparingInt((R r) -> r.channel().length())
                             .thenComparing(R::channel)
                     )
                     .distinct()
-                    .forEach(r -> out.printf("<tr><td style=\"padding: 10px;\">[%s]</td><td style=\"padding: 10px;\"><b>%s</b><br />%s</td></tr>", r.channel(), r.show(), r.summary()))
+                    //.forEach(r -> out.printf("<tr><td style=\"padding: 10px;\">[%s]</td><td style=\"padding: 10px;\"><b>%s</b><br />%s</td></tr>", r.channel(), r.show(), r.summary()))
+                    .forEach(r -> out.printf(tr, r.channel(), r.imageUrl().isEmpty() ? "https://upload.wikimedia.org/wikipedia/commons/e/ed/Pix.gif" : r.imageUrl(), r.show(), r.summary()))
                 ;
                 out.printf("</table>");
             });  
