@@ -159,6 +159,11 @@ public class TvMazeParser {
         String name;
         String country;
         
+        String idd = asString(show, "id");
+        if (idd != null && "93874".equalsIgnoreCase(idd)) {
+            System.out.printf("found it!%n");
+        }
+        
         // Type
         type = null; 
         JsonNode channelNode = NullNode.getInstance();
@@ -172,33 +177,39 @@ public class TvMazeParser {
                 type = Type.WEB;
             }
             if (channelNode.isMissingNode() || channelNode.isNull()) {
-                throw new RuntimeException(
+                channelNode = null;
+                System.out.println(
                     "both network and webChannel are missing for node %s".formatted(show)
-                );   
+                ); 
             }
         }
           
-        // id
-        id = asIntRequired(channelNode, "id");
-        
-        // name
-        name = asStringRequired(channelNode, "name");
-        if (ChannelInfo.exclude.contains(name)) {
+        if (channelNode == null) {
             return null;
         }
-        
-        // country
-        country = ""; JsonNode countryNode = channelNode.path("country");
-        if (!countryNode.isMissingNode()) {
-            country = asString(countryNode, "code");
-        }
+        else {
+            // id
+            id = asIntRequired(channelNode, "id");
 
-        // return
-        return new ChannelInfo(
-              type
-            , id
-            , name
-            , country
-        );
+            // name
+            name = asStringRequired(channelNode, "name");
+            if (ChannelInfo.exclude.contains(name)) {
+                return null;
+            }
+
+            // country
+            country = ""; JsonNode countryNode = channelNode.path("country");
+            if (!countryNode.isMissingNode()) {
+                country = asString(countryNode, "code");
+            }
+
+            // return
+            return new ChannelInfo(
+                  type
+                , id
+                , name
+                , country
+            );
+        }
     }
 }
