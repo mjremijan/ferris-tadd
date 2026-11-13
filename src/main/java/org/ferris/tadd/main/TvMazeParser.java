@@ -37,15 +37,24 @@ public class TvMazeParser {
             if (episode == null || episode.isNull()) {
                 continue;
             }
-            // ROOT _embedded>>show
-            JsonNode show = episode.path("_embedded").path("show");
-            if (show == null || show.isMissingNode()) {
-                continue;
-            }
             
             // episode info
             EpisodeInfo episodeInfo = parseEpisodeInfo(episode);
             if (episodeInfo == null) {
+                continue;
+            }
+            
+            // ROOT show
+            JsonNode show1 = episode.path("show");
+            if (show1 == null || show1.isMissingNode()) {
+                show1 = null;
+            }
+            JsonNode show2 = episode.path("_embedded").path("show");
+            if (show2 == null || show2.isMissingNode()) {
+                show2 = null;
+            }
+            JsonNode show = (show1 != null) ? show1 : show2;
+            if (show == null || show.isMissingNode()) {
                 continue;
             }
             
@@ -110,23 +119,12 @@ public class TvMazeParser {
     }
 
     private EpisodeInfo parseEpisodeInfo(JsonNode episode) {
-        LocalDate start = config.isShowsForToday() ? LocalDate.now() : LocalDate.now().plusDays(1);
-        LocalDate cutoff = start.plusDays(config.getShowsForDays() - 1);
-        
-        // air date
-        String airDateText = asStringRequired(episode, "airdate");
-        LocalDate airDate = LocalDate.parse(airDateText);
-        if (airDate.isBefore(start) || airDate.isAfter(cutoff)) {
-            return null;
-        }
-
-        // return
         return new EpisodeInfo(
               asIntRequired(episode, "id")
             , asStringRequired(episode, "name")
             , asInt(episode, "season", 0)
             , asInt(episode, "number", 0)
-            , airDate
+            , LocalDate.parse(asStringRequired(episode, "airdate"))
         );
     }
 
