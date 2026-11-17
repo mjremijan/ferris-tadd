@@ -36,8 +36,7 @@ public class Main {
         
         
         System.out.printf("Downloading schedule%n");
-        String json = client.downloadSchedule(config.isShowsForToday(), config.getShowsForDays());
-        System.out.printf("%n%s%n%n", json);
+        String json = client.downloadSchedule(config.isShowsForToday(), config.getShowsForDays());        
         
         System.out.printf("Logging airings%n");
         parser.streamUpcomingEpisodes(json)
