@@ -85,22 +85,27 @@ public class Main {
 
                 out.printf("<p><b>%s</b></p>", date.format(formatter));
 
-                record R(String channel, String show, String summary, String imageUrl){}
+                record R(String channel, String show, String url, String summary, String imageUrl){
+                    public String showNameOrLink() {
+                        return (url.isEmpty()) ? show : "<a href=\"%s\">%s</a>".formatted(url, show);
+                    }
+                }
                 out.printf("<table border=\"1\">%n");
                 episodesForDate.stream()
-                    .map(a -> new R(a.channel().name(), a.show().name(), a.show().summary(), a.show().imageUrl()))
+                    .map(a -> new R(a.channel().name(), a.show().name(), a.show().url(), a.show().summary(), a.show().imageUrl()))
                     .sorted(Comparator.comparingInt((R r) -> r.channel().length())
                             .thenComparing(R::channel)
                     )
                     .distinct()
                     //.forEach(r -> out.printf("<tr><td style=\"padding: 10px;\">[%s]</td><td style=\"padding: 10px;\"><b>%s</b><br />%s</td></tr>", r.channel(), r.show(), r.summary()))
-                    .forEach(r -> out.printf(tr, r.channel(), r.imageUrl().isEmpty() ? "https://upload.wikimedia.org/wikipedia/commons/e/ed/Pix.gif" : r.imageUrl(), r.show(), r.summary()))
+                    .forEach(r -> out.printf(tr, r.channel(), r.imageUrl().isEmpty() ? "https://upload.wikimedia.org/wikipedia/commons/e/ed/Pix.gif" : r.imageUrl(), r.showNameOrLink(), r.summary()))
                 ;
                 out.printf("</table>");
             });  
 
         if (!config.isSendEmail()) {
             System.out.printf("Sending email DISABLED%n");
+            System.out.printf("%s%n", sw.toString());
         } 
         else
         {

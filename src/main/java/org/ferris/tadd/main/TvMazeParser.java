@@ -147,6 +147,7 @@ public class TvMazeParser {
             , asString(show, "language")
             , asString(show, "summary")
             , imageUrl
+            , asString(show, "url")
         );
     }
     

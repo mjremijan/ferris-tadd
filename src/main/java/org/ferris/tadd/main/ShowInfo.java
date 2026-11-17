@@ -6,6 +6,7 @@ public record ShowInfo(
         , String language
         , String summary
         , String imageUrl
+        , String url
 ) {
     @Override
     public String toString() {
